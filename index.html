@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>考研英语录题格式转换工具 · 开发记录</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F6F8FB;
+    --card: #FFFFFF;
+    --text: #152033;
+    --text-sub: #637089;
+    --blue: #2F6BFF;
+    --blue-light: #E8F0FF;
+    --green: #16A37B;
+    --green-light: #E6F6F1;
+    --orange: #F59E0B;
+    --orange-light: #FEF3E2;
+    --purple: #7C3AED;
+    --purple-light: #F0EBFF;
+    --border: #E6EAF2;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* Header */
+  header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .header-left .subtitle {
+    color: var(--text-sub);
+    font-size: 13px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+
+  /* Info row */
+  .info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .info-card .label {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+  }
+  .info-card .value {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* Section */
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  section h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 3px solid var(--blue);
+  }
+
+  /* Phase group */
+  .phase-group {
+    margin-bottom: 28px;
+  }
+  .phase-group:last-child {
+    margin-bottom: 0;
+  }
+  .phase-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-title .phase-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 18px;
+  }
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -24px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--card);
+    background: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-light);
+  }
+  .timeline-item.iterate .timeline-dot {
+    background: var(--orange);
+    box-shadow: 0 0 0 2px var(--orange-light);
+  }
+  .timeline-item.ship .timeline-dot {
+    background: var(--green);
+    box-shadow: 0 0 0 2px var(--green-light);
+  }
+  .timeline-item.decision .timeline-dot {
+    background: var(--purple);
+    box-shadow: 0 0 0 2px var(--purple-light);
+  }
+  .timeline-date {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 2px;
+  }
+  .timeline-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+  .timeline-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag-blue { background: var(--blue-light); color: var(--blue); }
+  .tag-orange { background: var(--orange-light); color: var(--orange); }
+  .tag-green { background: var(--green-light); color: var(--green); }
+  .tag-purple { background: var(--purple-light); color: var(--purple); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    color: var(--text-sub);
+    font-size: 12px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .container { max-width: 100%; padding: 0; }
+    section, header { border: none; border-radius: 0; padding: 20px 0; border-bottom: 1px solid #ddd; }
+    header { border-bottom: 2px solid var(--blue); }
+    section:last-child { border-bottom: none; }
+    .timeline::before { background: #ccc; }
+    .timeline-dot { box-shadow: none !important; border-color: white; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <h1>考研英语录题格式转换工具 · 开发记录</h1>
+      <div class="subtitle">AI辅助提效项目 · 人机对话式协作开发</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <span class="badge badge-blue">纯前端 · v1.1</span>
+      <span class="badge badge-green">GitHub Pages 上线</span>
+    </div>
+  </header>
+
+  <!-- Info -->
+  <div class="info-row">
+    <div class="info-card">
+      <div class="label">开发者</div>
+      <div class="value">王懿蓓</div>
+    </div>
+    <div class="info-card">
+      <div class="label">开发周期</div>
+      <div class="value">2026年9月（约1周）</div>
+    </div>
+    <div class="info-card">
+      <div class="label">技术栈</div>
+      <div class="value">HTML + JS + docx.js</div>
+    </div>
+    <div class="info-card">
+      <div class="label">迭代版本</div>
+      <div class="value">3次架构迭代</div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <section>
+    <h2>开发节点</h2>
+
+    <!-- 第一阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">1</span>
+        第一阶段：原型验证期（Flask Python 版）
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-05</div>
+          <div class="timeline-title">项目立项 · 需求明确 <span class="timeline-tag tag-blue">起点</span></div>
+          <div class="timeline-desc">
+            从教研实际痛点出发，明确核心需求：整卷拆分 + 分题型编辑 + Word导出。<br>
+            目标：将人工45分钟的套卷格式化工时压缩至分钟级。
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-06 至 09-07</div>
+          <div class="timeline-title">Flask 版功能全量完成</div>
+          <div class="timeline-desc">
+            AI 辅助实现 Flask Python 后端版，7 大标签页全部完成，覆盖 9 大题型。<br>
+            Netlify 云端部署，团队开始试用。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">2</span>
+        第二阶段：方案转型期（纯前端重构）
+      </div>
+      <div class="timeline">
+        <div class="timeline-item decision">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 上午</div>
+          <div class="timeline-title">关键决策 · 转向纯前端方案 <span class="timeline-tag tag-purple">架构转型</span></div>
+          <div class="timeline-desc">
+            发现 Flask 版存在两个致命问题：<br>
+            ① 教研同事不会装 Python 环境，使用门槛高<br>
+            ② Netlify 团队版 build 额度不足，不稳定<br>
+            <strong>决策：重构成纯前端方案，用 docx.js 实现前端 Word 导出，GitHub Pages 免费部署。</strong>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 中午</div>
+          <div class="timeline-title">纯前端版核心完成 + UI 重做</div>
+          <div class="timeline-desc">
+            全部逻辑迁移至前端 JavaScript，零后端依赖。<br>
+            UI 重新设计为清爽蓝白卡片式布局，1200px 居中两栏预览。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第三阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">3</span>
+        第三阶段：格式打磨期（v1.0 → v1.1）
+      </div>
+      <div class="timeline">
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 下午</div>
+          <div class="timeline-title">新题型 bug 修复 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            用真实测试卷验收，发现并修复 2 个核心 bug：<br>
+            ① 选项重复：答案标记 [D] 混入选项列表 → 增加选项去重逻辑<br>
+            ② 引导段缺失：G 选项后段落被误吞 → 重写选项收集逻辑，以 41 题为边界
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 下午</div>
+          <div class="timeline-title">完形格式兼容扩展 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            发现实际试卷格式多样，扩展 parser 兼容能力：<br>
+            • 题号格式：支持数字. /【数字】/ [数字] / (数字) 4 种<br>
+            • 选项格式：支持 A. / [A] / A） 3 种<br>
+            • 新增答案自动连写功能（失焦去空格去换行）
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 下午</div>
+          <div class="timeline-title">完形下划线格式三版迭代 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            经过三次调整，最终定版"带编号的下划线"格式：<br>
+            v1 纯下划线 ____ → v2 数字两侧分开划线 → v3 数字+两侧空格整体加下划线
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 下午</div>
+          <div class="timeline-title">实时预览功能完善</div>
+          <div class="timeline-desc">
+            HTML 预览从纯文本改为富文本渲染，下划线、加粗、选项排版所见即所得。<br>
+            修复新题型题号下划线双重叠加问题（下划线字符 + CSS 下划线重复）。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第四阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">4</span>
+        第四阶段：上线交付
+      </div>
+      <div class="timeline">
+        <div class="timeline-item ship">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-08 下午</div>
+          <div class="timeline-title">v1.1 正式版 + GitHub Pages 部署 <span class="timeline-tag tag-green">上线</span></div>
+          <div class="timeline-desc">
+            工具通过 GitHub Pages 正式部署上线，发链接即用，教研团队全员可访问。<br>
+            零安装、零成本、零运维。
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-09</div>
+          <div class="timeline-title">AI 提效案例申报文档完成</div>
+          <div class="timeline-desc">
+            基于工具完成 AI 提效案例申报材料撰写，包含业务背景、方案亮点、提效测算、搭建心得等完整内容。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    考研英语录题格式转换工具 · 开发记录 · 王懿蓓 · 2026年9月
+  </footer>
+
+</div>
+</body>
+</html>
