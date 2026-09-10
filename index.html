@@ -237,7 +237,7 @@
       <div class="subtitle">AI辅助提效项目 · 人机对话式协作开发</div>
     </div>
     <div style="display:flex;gap:8px;">
-      <span class="badge badge-blue">纯前端 · v1.1</span>
+      <span class="badge badge-blue">纯前端 · v1.2.1</span>
       <span class="badge badge-green">GitHub Pages 上线</span>
     </div>
   </header>
@@ -258,7 +258,7 @@
     </div>
     <div class="info-card">
       <div class="label">迭代版本</div>
-      <div class="value">3次架构迭代</div>
+      <div class="value">5次架构迭代</div>
     </div>
   </div>
 
@@ -377,15 +377,148 @@
     <div class="phase-group">
       <div class="phase-title">
         <span class="phase-icon">4</span>
-        第四阶段：上线交付
+        第四阶段：月测模式扩展（v1.2）
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-09</div>
+          <div class="timeline-title">月测模式立项 <span class="timeline-tag tag-blue">新需求</span></div>
+          <div class="timeline-desc">
+            月考试题结构与真题不同：语法 + 词汇双Part + 完形 + 翻译，共4大题。<br>
+            需要新增独立模式，与真题模式平行。
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-09</div>
+          <div class="timeline-title">月测全题型整卷导入</div>
+          <div class="timeline-desc">
+            新增月测试题/答案解析识别器，支持：<br>
+            • 语法题（1-5）<br>
+            • 词汇 Part1 词义替换（6-15）+ Part2 选词填空（16-25）<br>
+            • 完形填空<br>
+            • 翻译（46-50）
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-09</div>
+          <div class="timeline-title">词汇双 Part 上下布局 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            词汇题分 Part1 / Part2 两个子 tab 独立编辑，合并导出 Word。<br>
+            各占独立大题编号，符合录题系统规范。
+          </div>
+        </div>
+        <div class="timeline-item ship">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">v1.2 月测模式全量验证通过 <span class="timeline-tag tag-green">里程碑</span></div>
+          <div class="timeline-desc">
+            整卷导入 → 分题型编辑 → 合并导出 Word 全链路打通。<br>
+            7月月考样题自测全部正确，与9月大模考样题全量对照验证通过。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第五阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">5</span>
+        第五阶段：粘贴体验打磨（v1.2.1）
+      </div>
+      <div class="timeline">
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">Word 粘贴下划线丢失 <span class="timeline-tag tag-orange">核心体验</span></div>
+          <div class="timeline-desc">
+            问题：从 Word 复制到 textarea 时格式信息全部丢失。<br>
+            方案：监听 paste 事件，解析 HTML 剪贴板，<strong>按字符追踪 underline/bold 格式</strong>，转换为 <code>__</code>/<code>**</code> 标记。<br>
+            覆盖所有输入框：整卷导入4个 + 月测4题型 + 真题各题型。
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">粘贴乱码 & 标记叠加修复 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            问题1：Word HTML 含 style/XML 声明/条件注释被当文本 → 修复：递归 walk DOM 时跳过 style/script/head 等非内容节点<br>
+            问题2：嵌套标签导致 <code>**</code> 和 <code>__</code> 叠加 → 修复：改用按字符格式追踪，每个字符只有一个 bold/underline 布尔值
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">Word 答案格式识别 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            问题：Word 中答案为 <code>【答案】X 【解析】...</code> 格式，原管道符格式解析失效。<br>
+            修复：<code>parseChoiceAnswersLocal</code> 新增 Word 原生小节格式兼容（【答案】【解析】【题干翻译】等）。
+          </div>
+        </div>
+        <div class="timeline-item decision">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">镜像层方案废弃 <span class="timeline-tag tag-purple">技术决策</span></div>
+          <div class="timeline-desc">
+            尝试透明 textarea + 格式化 div 实现 WYSIWYG 效果，但出现：<br>
+            文字重影、底部重边框、对齐偏移、词汇题标记显示异常等大量 bug。<br>
+            <strong>决策：稳定性优先，放弃镜像层，恢复纯 textarea + 右侧预览模式。</strong>
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">完形 & 选词填空下划线修复 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            选词填空：<code>________</code> 空位连续下划线被 <code>__(.+?)__</code> 正则误匹配 → 正则改为 <code>__([^_]+?)__</code><br>
+            完形空位：序号从 1 开始重排 + 仅识别 <code>__数字__</code> 标记格式，避免年份等普通数字误判
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">完形粘贴自动拆分选项 <span class="timeline-tag tag-blue">新功能</span></div>
+          <div class="timeline-desc">
+            从 Word 复制完形全文（文章 + 选项连写/分行）时自动拆分：<br>
+            文章留当前输入框，选项自动填入下方选项框。<br>
+            支持换行格式和连写格式两种模式。
+          </div>
+        </div>
+        <div class="timeline-item iterate">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 上午</div>
+          <div class="timeline-title">月测翻译格式对齐 <span class="timeline-tag tag-orange">迭代</span></div>
+          <div class="timeline-desc">
+            标签从【解答题】统一为【复合题】。<br>
+            新增 Word 答案解析合并格式支持：<code>数字.【答案】...【解析】...</code>，粘贴后自动拆分答案和解析。
+          </div>
+        </div>
+        <div class="timeline-item ship">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 中午</div>
+          <div class="timeline-title">v1.2.1 上线 <span class="timeline-tag tag-green">上线</span></div>
+          <div class="timeline-desc">
+            Word 粘贴全链路打通 + 完形/选词填空修复 + 月测格式对齐 + 自动拆分选项。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第六阶段 -->
+    <div class="phase-group">
+      <div class="phase-title">
+        <span class="phase-icon">6</span>
+        第六阶段：上线交付
       </div>
       <div class="timeline">
         <div class="timeline-item ship">
           <div class="timeline-dot"></div>
           <div class="timeline-date">2026-09-08 下午</div>
-          <div class="timeline-title">v1.1 正式版 + GitHub Pages 部署 <span class="timeline-tag tag-green">上线</span></div>
+          <div class="timeline-title">v1.1 首次上线 <span class="timeline-tag tag-green">上线</span></div>
           <div class="timeline-desc">
-            工具通过 GitHub Pages 正式部署上线，发链接即用，教研团队全员可访问。<br>
+            工具通过 GitHub Pages 首次部署上线，发链接即用，教研团队全员可访问。<br>
             零安装、零成本、零运维。
           </div>
         </div>
@@ -397,13 +530,29 @@
             基于工具完成 AI 提效案例申报材料撰写，包含业务背景、方案亮点、提效测算、搭建心得等完整内容。
           </div>
         </div>
+        <div class="timeline-item ship">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10 中午</div>
+          <div class="timeline-title">v1.2.1 最新版部署 <span class="timeline-tag tag-green">上线</span></div>
+          <div class="timeline-desc">
+            月测模式 + Word 粘贴增强版本上线，支持真题/月测双模式切换。
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2026-09-10</div>
+          <div class="timeline-title">AI 提效案例申报文档修订</div>
+          <div class="timeline-desc">
+            基于 v1.2.1 新功能更新 AI 提效案例申报材料，补充月测模式扩展、Word 粘贴体验优化等新增提效点。
+          </div>
+        </div>
       </div>
     </div>
 
   </section>
 
   <footer>
-    考研英语录题格式转换工具 · 开发记录 · 王懿蓓 · 2026年9月
+    考研英语录题格式转换工具 · 开发记录 · v1.2.1 · 王懿蓓 · 2026年9月
   </footer>
 
 </div>
